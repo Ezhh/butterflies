@@ -33,5 +33,9 @@ Textures
 --------
 
 Shara RedCat (CC BY-SA 3.0):
-  butterflies_butterfly.png
-  butterflies_butterfly_animated.png
+  butterflies_butterfly_red.png
+  butterflies_butterfly_red_animated.png
+  butterflies_butterfly_violet.png
+  butterflies_butterfly_violet_animated.png
+  butterflies_butterfly_white.png
+  butterflies_butterfly_white_animated.png
