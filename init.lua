@@ -40,3 +40,20 @@ for i in ipairs (butter_list) do
 	})
 end
 
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass"},
+	place_offset_y = 1,
+	sidelen = 16,
+	fill_ratio = 0.005,
+	biomes = {"grassland", "deciduous_forest"},
+	y_max = 300,
+	y_min = 1,
+	decoration = {
+		"butterflies:butterfly_white",
+		"butterflies:butterfly_red",
+		"butterflies:butterfly_violet"
+	},
+	spawn_by = "group:flower",
+	num_spawn_by = 1
+})
