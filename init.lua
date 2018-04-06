@@ -1,4 +1,4 @@
-
+-- register butterflies
 local butter_list = {
 	{"white", "White"},
 	{"red", "Red"},
@@ -36,11 +36,65 @@ for i in ipairs (butter_list) do
 		floodable = true,
 		on_flood = function(pos, oldnode, newnode)
 			minetest.add_item(pos, "butterflies:butterfly_"..name.."1")
+		end,
+		on_place = function(itemstack, placer, pointed_thing)
+			local player_name = placer:get_player_name()
+			local pos = pointed_thing.above
+
+			if not minetest.is_protected(pos, player_name) and
+					not minetest.is_protected(pointed_thing.under, player_name) and
+					minetest.get_node(pos).name == "air" then
+				minetest.set_node(pos, {name = "butterflies:butterfly_"..name})
+				minetest.get_node_timer(pos):start(1)
+				itemstack:take_item()
+			end
+			return itemstack
+		end,
+		on_timer = function(pos, elapsed)
+			if minetest.get_node_light(pos) < 11 then
+				minetest.set_node(pos, {name = "butterflies:hidden_butterfly_"..name})
+			end
+			minetest.get_node_timer(pos):start(30)
+		end
+	})
+
+	minetest.register_node("butterflies:hidden_butterfly_"..name, {
+		description = "Hidden "..desc.." Butterfly",
+		drawtype = "airlike",
+		inventory_image = "insects_butterfly_"..name..".png",
+		wield_image =  "insects_butterfly_"..name..".png",
+		paramtype = "light",
+		sunlight_propagates = true,
+		walkable = false,
+		pointable = false,
+		diggable = false,
+		drop = "",
+		groups = {not_in_creative_inventory = 1},
+		on_place = function(itemstack, placer, pointed_thing)
+			local player_name = placer:get_player_name()
+			local pos = pointed_thing.above
+
+			if not minetest.is_protected(pos, player_name) and
+					not minetest.is_protected(pointed_thing.under, player_name) and
+					minetest.get_node(pos).name == "air" then
+				minetest.set_node(pos, {name = "butterflies:hidden_butterfly_"..name})
+				minetest.get_node_timer(pos):start(1)
+				itemstack:take_item()
+			end
+			return itemstack
+		end,
+		on_timer = function(pos, elapsed)
+			if minetest.get_node_light(pos) >= 11 then
+				minetest.set_node(pos, {name = "butterflies:butterfly_"..name})
+			end
+			minetest.get_node_timer(pos):start(30)
 		end
 	})
 end
 
+-- register decoration
 minetest.register_decoration({
+	name = "butterflies:butterfly",
 	deco_type = "simple",
 	place_on = {"default:dirt_with_grass"},
 	place_offset_y = 1,
@@ -57,3 +111,25 @@ minetest.register_decoration({
 	spawn_by = "group:flower",
 	num_spawn_by = 1
 })
+
+-- get decoration ID
+local butterflies = minetest.get_decoration_id("butterflies:butterfly")
+minetest.set_gen_notify({decoration = true}, {butterflies})
+
+-- start nodetimers
+minetest.register_on_generated(function(minp, maxp, blockseed)
+	local gennotify = minetest.get_mapgen_object("gennotify")
+	local poslist = {}
+
+	for _, pos in ipairs(gennotify["decoration#"..butterflies] or {}) do
+		local deco3_pos = {x = pos.x, y = pos.y + 2, z = pos.z}
+		table.insert(poslist, deco3_pos)
+	end
+
+	if #poslist ~= 0 then
+		for i = 1, #poslist do
+			local pos = poslist[i]
+			minetest.get_node_timer(pos):start(1)
+		end
+	end
+end)
